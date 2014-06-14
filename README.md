@@ -42,6 +42,4 @@ To test this in a real weechat:
 - `/join` a new channel for a Slack-based server
 - See backlog!
 
-![simple](simple.png)
-
-*Note that the messages in that shot are reversed...*
+![shot](shot.png)
