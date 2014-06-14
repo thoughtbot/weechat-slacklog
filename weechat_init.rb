@@ -3,6 +3,8 @@ Slacklog.servers = []
 
 def on_buffer_opened(_, _, buffer_id)
   Slacklog.append_history(Weechat, buffer_id)
+
+  Weechat::WEECHAT_RC_OK
 end
 
 def weechat_init
