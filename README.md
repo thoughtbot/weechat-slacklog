@@ -27,8 +27,7 @@ You can find your API token [here][docs].
 
 ## What's left?
 
-- Order the history correctly
-- Don't just `Weechat.print` to the buffer, add them as messages
+- Show accurate timestamps (is this even possible?)
 - Weechat configuration hooks
 
 ## Try it
