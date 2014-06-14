@@ -42,3 +42,7 @@ To test this in a real weechat:
 - See backlog!
 
 ![shot](shot.png)
+
+Note that what you're seeing in the screen shot is the script adding the 
+history, then weechat re-reporting the last 20 lines of it as buffer 
+backlog.
