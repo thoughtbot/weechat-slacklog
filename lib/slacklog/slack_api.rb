@@ -40,7 +40,7 @@ module Slacklog
       end
 
       def history
-        messages.map do |object|
+        messages.reverse.map do |object|
           user = object["user"]
           text = object["text"]
 

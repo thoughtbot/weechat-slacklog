@@ -17,7 +17,7 @@ module Slacklog
       if servers.include?(buffer.server)
         slack_api = SlackAPI.new(token)
         slack_api.find_room(buffer.name).history.each do |message|
-          buffer.print("[#{message.nick}]: #{message.body}")
+          buffer.print("#{message.nick}]\t#{message.body}")
         end
       end
     end
