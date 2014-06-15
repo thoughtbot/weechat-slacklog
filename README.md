@@ -12,7 +12,7 @@ Pull [Slack][] chat history in when opening a new buffer.
 
 ```
 % curl -o ~/.weechat/ruby/slacklog.rb \
-> "https://github.com/pbrisbin/weechat-slacklog/blob/master/slacklog.rb"
+> "https://raw.githubusercontent.com/pbrisbin/weechat-slacklog/master/slacklog.rb"
 ```
 
 ## Usage
