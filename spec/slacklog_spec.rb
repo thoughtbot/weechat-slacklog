@@ -151,7 +151,7 @@ context "slacklog.rb" do
           expect(Weechat).to have_received(:hook_signal)
         end
 
-        it "initializes in tokens" do
+        it "initializes tokens" do
           allow(Weechat).to receive(:config_get_plugin).
             with("servers").and_return("foo")
 
