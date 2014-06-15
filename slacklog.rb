@@ -129,7 +129,7 @@ def on_process_complete(buffer_id, _, rc, out, _)
   Weechat::WEECHAT_RC_OK
 end
 
-def read_tokens
+def read_tokens(*)
   server_list = Weechat.config_get_plugin("servers")
   server_list.split(",").map(&:strip).each do |server|
     API_TOKENS[server] = Weechat.config_get_plugin("#{server}.api_token")
