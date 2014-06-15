@@ -12,8 +12,9 @@ def on_buffer_opened(_, _, buffer_id)
 end
 
 def on_process_complete(buffer_id, _, rc, out, _)
-  if rc.to_i >= 0
-    out.lines { |line| Weechat.print(buffer_id, line) }
+  if rc.to_i == 0
+    color = Weechat.color("darkgrey")
+    out.lines { |line| Weechat.print(buffer_id, "#{color}#{line}) }
   end
 
   Weechat::WEECHAT_RC_OK
