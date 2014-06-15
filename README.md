@@ -35,8 +35,5 @@ To try it out:
 
 ## Known bugs
 
-- The script prints the history into the buffer before Weechat's own 
-  backlog function runs. This causes the last 20 lines to be repeated as 
-  buffer backlog.
 - The body has escaped HTML entities.
 - Any "@-mentions" in the body appear as User IDs.
