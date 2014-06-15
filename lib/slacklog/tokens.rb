@@ -8,8 +8,6 @@ module Slacklog
 
     def read
       update_tokens(config("servers"))
-
-      @weechat.print("", "slacklog: loaded api tokens: #{@tokens.inspect}")
     end
 
     def update(option, value)
