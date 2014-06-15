@@ -80,4 +80,86 @@ context "slacklog.rb" do
         to_return(body: response.to_json)
     end
   end
+
+  context "on_buffer_opened" do
+    it "spawns the script if we have a token" do
+      API_TOKENS["foo"] = "api-token"
+      allow(Weechat).to receive(:buffer_get_string).
+        with("1", "name").and_return("foo.#bar")
+
+      on_buffer_opened(nil, nil, "1")
+
+      expect(Weechat).to have_received(:hook_process).
+        with(
+          "ruby '#{SCRIPT_FILE}' fetch 'api-token' '#bar'",
+          0,
+          "on_process_complete",
+          "1"
+        )
+    end
+
+    it "does nothing if we have no token" do
+      allow(Weechat).to receive(:buffer_get_string).
+        with("1", "name").and_return("foo.#bar")
+
+      on_buffer_opened(nil, nil, "1")
+
+      expect(Weechat).not_to have_received(:hook_process)
+    end
+  end
+
+  context "on_process_complete" do
+    it "prints colorized history on success" do
+      out = "foo\tbar\nbaz\tbat\n"
+      allow(Weechat).to receive(:color).and_return("C")
+
+      on_process_complete("1", nil, 0, out, nil)
+
+      expect(Weechat).to have_received(:print).with("1", "Cfoo\tCbar")
+      expect(Weechat).to have_received(:print).with("1", "Cbaz\tCbat")
+    end
+
+    it "does nothing if not successful" do
+      on_process_complete(nil, nil, 127, nil, nil)
+
+      expect(Weechat).not_to have_received(:print)
+    end
+
+    context "read_tokens" do
+      it "reads weechat configuration into API_TOKENS" do
+        allow(Weechat).to receive(:config_get_plugin).
+          with("servers").and_return("foo,bar")
+        allow(Weechat).to receive(:config_get_plugin).
+          with("foo.api_token").and_return("foo-api-token")
+        allow(Weechat).to receive(:config_get_plugin).
+          with("bar.api_token").and_return("bar-api-token")
+
+        read_tokens
+
+        expect(API_TOKENS).to eq({
+          "foo" => "foo-api-token",
+          "bar" => "bar-api-token",
+        })
+      end
+
+      context "weechat_init" do
+        it "registers with Weechat and sets up hooks" do
+          weechat_init
+
+          expect(Weechat).to have_received(:register)
+          expect(Weechat).to have_received(:hook_config)
+          expect(Weechat).to have_received(:hook_signal)
+        end
+
+        it "initializes in tokens" do
+          allow(Weechat).to receive(:config_get_plugin).
+            with("servers").and_return("foo")
+
+          weechat_init
+
+          expect(API_TOKENS).to have_key("foo")
+        end
+      end
+    end
+  end
 end
