@@ -6,19 +6,16 @@ Pull [Slack][] chat history in when opening a new buffer.
 
 ![shot](shot.png)
 
+## Installation
+
+*This script is very Alpha.*
+
+```
+% curl -o ~/.weechat/ruby/slacklog.rb \
+> "https://github.com/pbrisbin/weechat-slacklog/blob/master/slacklog.rb"
+```
+
 ## Usage
-
-*This script is very Alpha, and not yet released.*
-
-To try it out:
-
-```
-% git clone https://github.com/pbrisbin/weechat-slacklog
-% cd slacklog
-% bundle
-% bundle exec rake build
-% cp ./slacklog.rb ~/.weechat/ruby/
-```
 
 ```
 /set plugins.var.ruby.slacklog.servers "thoughtbot"
@@ -26,10 +23,7 @@ To try it out:
 /script load slacklog.rb
 ```
 
-- You can enable the script for multiple servers by setting a 
-  comma-separated list; that's why the `api_token` setting is 
-  namespaced.
-- You can find your API token [here][docs].
+Find your API token [here][docs].
 
 [docs]: https://api.slack.com/
 
