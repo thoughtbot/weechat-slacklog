@@ -160,7 +160,5 @@ if ARGV.first == "fetch"
   _, token, room_name = ARGV
 
   slack_api = SlackAPI.new(token)
-  slack_api.find_room(room_name).history.each do |message|
-    puts "#{message.nick}\t#{message.body}"
-  end
+  slack_api.backlog(room_name).each { |line| puts line }
 end
