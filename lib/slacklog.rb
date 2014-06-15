@@ -4,22 +4,20 @@ module Slacklog
   VERSION = "0.1"
   LICENSE = "MIT"
   DESCRIPTION = "Slack backlog"
+  CONFIG_NS = "plugins.var.ruby.#{NAME}"
 
-  class << self
-    attr_accessor :token
-    attr_accessor :servers
+  def self.append_history(buffer_id)
+    server, name = Weechat.buffer_get_string(buffer_id, "name").split('.')
+
+    return unless token = tokens[server]
+
+    slack_api = SlackAPI.new(token)
+    slack_api.find_room(name).history.each do |message|
+      Weechat.print(buffer_id, "#{message.nick}\t#{message.body}")
+    end
   end
 
-  def self.append_history(weechat, buffer_id)
-    weechat_api = WeechatAPI.new(weechat)
-
-    if buffer = weechat_api.find_buffer(buffer_id)
-      if servers.include?(buffer.server)
-        slack_api = SlackAPI.new(token)
-        slack_api.find_room(buffer.name).history.each do |message|
-          buffer.print("#{message.nick}]\t#{message.body}")
-        end
-      end
-    end
+  def self.tokens
+    @tokens ||= Tokens.new(Weechat, CONFIG_NS)
   end
 end

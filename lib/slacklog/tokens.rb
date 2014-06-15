@@ -21,10 +21,6 @@ module Slacklog
       end
     end
 
-    def keys
-      @tokens.keys
-    end
-
     def [](server)
       @tokens[server]
     end

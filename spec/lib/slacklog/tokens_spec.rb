@@ -11,7 +11,6 @@ describe Slacklog::Tokens do
 
     tokens.read
 
-    expect(tokens.keys).to match_array %w[foo bar]
     expect(tokens["foo"]).to eq "123"
     expect(tokens["bar"]).to eq "456"
   end
@@ -24,7 +23,6 @@ describe Slacklog::Tokens do
       "namespace.baz.api_token" => "789",
     )
     tokens = Slacklog::Tokens.new(weechat, "namespace")
-    tokens.read
 
     tokens.update("namespace.servers", "bar,baz")
 
