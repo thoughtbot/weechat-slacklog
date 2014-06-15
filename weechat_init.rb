@@ -13,8 +13,12 @@ end
 
 def on_process_complete(buffer_id, _, rc, out, _)
   if rc.to_i == 0
-    color = Weechat.color("darkgrey")
-    out.lines { |line| Weechat.print(buffer_id, "#{color}#{line}) }
+    color = Weechat.color("darkgray,normal")
+
+    out.lines do |line|
+      nick, text = line.strip.split("\t")
+      Weechat.print(buffer_id, "%s%s\t%s%s" % [color, nick, color, text])
+    end
   end
 
   Weechat::WEECHAT_RC_OK
