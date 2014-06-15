@@ -1,7 +1,6 @@
 require "rspec"
 require "webmock"
-require "slacklog/slack_api"
-require "slacklog/tokens"
+require_relative "../slacklog"
 
 RSpec.configure do |conf|
   conf.include(WebMock::API)
