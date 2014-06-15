@@ -6,78 +6,68 @@ context "slacklog.rb" do
 
     it "raises when appropriate" do
       api = SlackAPI.new(token)
-      mock_slack_api("channels.list?token=#{token}", ok: false)
+      mock_slack_api("users.list?token=#{token}" => { ok: false })
 
-      expect { api.find_room("#general") }.to raise_error(/API Error/)
+      expect { api.backlog("#general") }.to raise_error(/API Error/)
     end
 
-    it "finds channels by name" do
-      api = SlackAPI.new(token)
-      mock_slack_api("channels.list?token=#{token}", {
-        ok: true,
-        channels: [{ id: "123", name: "general" }]
-      })
-
-      channel = api.find_room("#general")
-
-      expect(channel.id).to eq "123"
-      expect(channel.name).to eq "general"
-    end
-
-    it "finds groups" do
-      api = SlackAPI.new(token)
-      mock_slack_api("channels.list?token=#{token}", {
-        ok: true,
-        channels: []
-      })
-      mock_slack_api("groups.list?token=#{token}", {
-        ok: true,
-        groups: [{ id: "456", name: "code" }]
-      })
-
-      group = api.find_room("#code")
-
-      expect(group.id).to eq "456"
-      expect(group.name).to eq "code"
-    end
-
-    context SlackAPI::Room do
-      context "#history" do
-        it "returns the backlog of messages" do
-          api = SlackAPI.new(token)
-          mock_slack_api("channels.list?token=#{token}", {
-            ok: true,
-            channels: [{ id: "123", name: "general" }]
-          })
-          mock_slack_api("channels.history?token=#{token}&channel=123", {
-            ok: true,
-            messages: [
-              { user: "1", text: "out" },
-              { user: "2", text: "bye" },
-            ]
-          })
-          mock_slack_api("users.list?token=#{token}", {
+    context "with thoughtbot's rooms" do
+      before do
+        mock_slack_api(
+          "users.list?token=#{token}" => {
             ok: true,
             members: [
               { id: "1", name: "adarsh" },
               { id: "2", name: "joe" },
             ]
-          })
-          channel = api.find_room("#general")
+          },
+          "channels.list?token=#{token}" => {
+            ok: true,
+            channels: [{ id: "123", name: "general" }]
+          },
+          "groups.list?token=#{token}" => {
+            ok: true,
+            groups: [{ id: "456", name: "dev" }]
+          },
+          "channels.history?token=#{token}&channel=123" => {
+            ok: true,
+            messages: [
+              { user: "1", text: "hello" },
+              { user: "2", text: "good bye" },
+            ]
+          },
+          "groups.history?token=#{token}&channel=456" => {
+            ok: true,
+            messages: [
+              { user: "1", text: "see ya" },
+              { user: "2", text: "later" },
+            ]
+          },
+        )
+      end
 
-          messages = channel.history
+      it "finds the backlog for the #general channel" do
+        api = SlackAPI.new(token)
 
-          expect(messages).to match_array [
-            SlackAPI::Message.new("adarsh", "out"),
-            SlackAPI::Message.new("joe", "bye"),
-          ]
-        end
+        backlog = api.backlog("#general")
+
+        expect(backlog).to match_array ["adarsh\thello", "joe\tgood bye"]
+      end
+
+      it "finds the backlog for the #dev group" do
+        api = SlackAPI.new(token)
+
+        backlog = api.backlog("#dev")
+
+        expect(backlog).to match_array ["adarsh\tsee ya", "joe\tlater"]
       end
     end
 
-    def mock_slack_api(path, response)
-      stub_request(:get, "#{SlackAPI::BASE_URL}/#{path}").
-        to_return(body: response.to_json)
+    def mock_slack_api(requests)
+      requests.each do |path, response|
+        stub_request(:get, "#{SlackAPI::BASE_URL}/#{path}").
+          to_return(body: response.to_json)
+      end
     end
   end
 
@@ -119,8 +109,19 @@ context "slacklog.rb" do
       expect(Weechat).to have_received(:print).with("1", "Cbaz\tCbat")
     end
 
-    it "does nothing if not successful" do
-      on_process_complete(nil, nil, 127, nil, nil)
+    it "prints error messages when unsuccessful" do
+      out = "foo\nbar\nbaz\nbat\n"
+
+      on_process_complete("1", nil, 127, out, nil)
+
+      expect(Weechat).to have_received(:print).with("", "slacklog error: foo")
+      expect(Weechat).to have_received(:print).with("", "slacklog error: bar")
+      expect(Weechat).to have_received(:print).with("", "slacklog error: baz")
+      expect(Weechat).to have_received(:print).with("", "slacklog error: bat")
+    end
+
+    it "does nothing if not finished" do
+      on_process_complete(nil, nil, -1, nil, nil)
 
       expect(Weechat).not_to have_received(:print)
     end

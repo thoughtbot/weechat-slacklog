@@ -44,72 +44,38 @@ API_TOKENS = {}
 class SlackAPI
   BASE_URL = "https://slack.com/api"
 
-  Message = Struct.new(:nick, :body)
-
-  User = Struct.new(:name) do
-    def self.find(api, user_id)
-      @list ||= api.rpc("users.list").fetch("members")
-
-      object = @list.detect { |o| o["id"] == user_id }
-      object && new(object["name"])
-    end
-  end
-
-  class Room
-    class << self
-      attr_accessor :name
-    end
-
-    def self.find(api, room_name)
-      room_name = room_name.sub(/^#/, '')
-
-      @list ||= api.rpc("#{name}.list").fetch(name)
-
-      object = @list.detect { |o| o["name"] == room_name }
-      object && new(api, object["id"], object["name"])
-    end
-
-    attr_reader :id, :name
-
-    def initialize(api, id, name)
-      @api = api
-      @id = id
-      @name = name
-    end
-
-    def history
-      messages.reverse.map do |object|
-        user = object["user"]
-        text = object["text"]
-
-        if user && text
-          nick = User.find(@api, user).name
-          nick && Message.new(nick, text)
-        end
-      end.compact
-    end
-
-    private
-
-    def messages
-      @api.rpc("#{self.class.name}.history", channel: id).fetch("messages")
-    end
-  end
-
-  class Channel < Room
-    self.name = "channels"
-  end
-
-  class Group < Room
-    self.name = "groups"
-  end
-
   def initialize(token)
     @token = token
   end
 
-  def find_room(name)
-    Channel.find(self, name) || Group.find(self, name)
+  def backlog(name)
+    name = name.sub(/^#/, "")
+    members = rpc("users.list").fetch("members")
+
+    history(name).reverse.map do |message|
+      if user_id = message["user"]
+        user = members.detect { |u| u["id"] == user_id }
+        user && "#{user["name"]}\t#{message["text"]}"
+      end
+    end.compact
+  end
+
+  private
+
+  def history(name)
+    channels = rpc("channels.list").fetch("channels")
+
+    if channel = channels.detect { |c| c["name"] == name }
+      return rpc("channels.history", channel: channel["id"]).fetch("messages")
+    end
+
+    groups = rpc("groups.list").fetch("groups")
+
+    if group = groups.detect { |g| g["name"] == name }
+      return rpc("groups.history", channel: group["id"]).fetch("messages")
+    end
+
+    []
   end
 
   def rpc(method, arguments = {})
@@ -123,8 +89,6 @@ class SlackAPI
   rescue JSON::ParserError
     raise "API Error: unable to parse HTTP response"
   end
-
-  private
 
   def parameterize(query)
     query.map { |k,v| "#{escape(k)}=#{escape(v)}" }.join("&")
@@ -153,6 +117,12 @@ def on_process_complete(buffer_id, _, rc, out, _)
     out.lines do |line|
       nick, text = line.strip.split("\t")
       Weechat.print(buffer_id, "%s%s\t%s%s" % [color, nick, color, text])
+    end
+  end
+
+  if rc.to_i > 0
+    out.lines do |line|
+      Weechat.print("", "slacklog error: #{line.strip}")
     end
   end
 
