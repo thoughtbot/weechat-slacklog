@@ -4,45 +4,39 @@ Pull [Slack][] chat history in when opening a new buffer.
 
 [slack]: https://slack.com/
 
+![shot](shot.png)
+
 ## Usage
 
-*Eventually...*
+*This script is very Alpha, and not yet released.*
+
+To try it out:
 
 ```
-/script install slacklog.rb
-/set plugins.var.ruby.slacklog.servers "foo,bar"
-/set plugins.var.ruby.slacklog.api_token "default api token"
-/set plugins.var.ruby.slacklog.foo.api_token "foo's api token"
-/set plugins.var.ruby.slacklog.bar.api_token "bar's api token"
+% git clone https://github.com/pbrisbin/weechat-slacklog
+% cd slacklog
+% bundle
+% bundle exec rake build
+% cp ./slacklog.rb ~/.weechat/ruby/
 ```
 
-You can find your API token [here][docs].
+```
+/set plugins.var.ruby.slacklog.servers "thoughtbot"
+/set plugins.var.ruby.slacklog.thoughtbot.api_token "abc-123"
+/script load slacklog.rb
+```
+
+- You can enable the script for multiple servers by setting a 
+  comma-separated list; that's why the `api_token` setting is 
+  namespaced.
+- You can find your API token [here][docs].
 
 [docs]: https://api.slack.com/
 
-## What's working?
+## Known bugs
 
-- Slack API calls for history
-- Printing the results into the buffer
-
-## What's left?
-
-- Show accurate timestamps (is this even possible?)
-- Weechat configuration hooks
-
-## Try it
-
-To test this in a real weechat:
-
-- Enter real values for `servers` and `token` in `lib/slacklog.rb`
-- Use `rake build` to generate `slacklog.rb`
-- Copy or move `slacklog.rb` to `~/.weechat/ruby/slacklog.rb`
-- In weechat, run `/script load slacklog.rb`
-- `/join` a new channel for a Slack-based server
-- See backlog!
-
-![shot](shot.png)
-
-Note that what you're seeing in the screen shot is the script adding the 
-history, then weechat re-reporting the last 20 lines of it as buffer 
-backlog.
+- The script prints the history into the buffer before Weechat's own 
+  backlog function runs. This causes the last 20 lines to be repeated as 
+  buffer backlog.
+- The body has escaped HTML entities.
+- Any "@-mentions" in the body appear as User IDs.
