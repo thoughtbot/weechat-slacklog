@@ -7,7 +7,7 @@ end
 SOURCES = %w[
   lib/slacklog.rb
   lib/slacklog/slack_api.rb
-  lib/slacklog/weechat_api.rb
+  lib/slacklog/tokens.rb
   weechat_init.rb
 ]
 
