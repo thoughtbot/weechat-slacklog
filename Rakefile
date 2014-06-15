@@ -13,16 +13,13 @@ SOURCES = %w[
 
 file "slacklog.rb" => SOURCES do |task|
   File.open(task.name, 'w') do |fh|
-    fh.puts "###"
-    fh.puts "#"
-    fh.puts "# DO NOT EDIT. This file is auto-generated."
-    fh.puts "# Last generated on #{Time.now}"
-    fh.puts "#"
-    fh.puts "###"
+    fh.puts "# DO NOT EDIT. This file is auto-generated.", "#"
 
     task.prerequisites.each do |source|
-      fh.puts "", File.read(source)
+      fh.puts File.read(source), ""
     end
+
+    fh.puts "# generated: #{Time.now}"
   end
 end
 
