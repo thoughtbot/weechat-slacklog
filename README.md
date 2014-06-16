@@ -8,32 +8,37 @@ Pull [Slack][] chat history in when opening a new buffer.
 
 ## Installation
 
-*This script is very Alpha.*
+This script is not yet released, please install manually:
 
 ```
 % curl -o ~/.weechat/ruby/slacklog.rb \
   "https://raw.githubusercontent.com/pbrisbin/weechat-slacklog/master/slacklog.rb"
 ```
 
-## Usage
-
-```
-/set plugins.var.ruby.slacklog.servers "thoughtbot"
-/set plugins.var.ruby.slacklog.thoughtbot.api_token "abc-123"
-/script load slacklog.rb
-```
-
-To setup auto-loading:
+Optionally set the script to autoload when weechat starts:
 
 ```
 % cd ~/.weechat/ruby/autoload && ln -s ../slacklog.rb .
 ```
 
-Find your API token [here][docs].
+Restart weechat or load the script manually:
 
-[docs]: https://api.slack.com/
+```
+/script load slacklog.rb
+```
+
+## Required Settings
+
+**Note**: You can generate an API token [here][docs].
+
+```
+/set plugins.var.ruby.slacklog.servers "thoughtbot"
+/set plugins.var.ruby.slacklog.thoughtbot.api_token "abc-123"
+```
+
+[docs]: https://api.slack.com#auth
 
 ## Known bugs
 
-- The body has escaped HTML entities.
-- Any "@-mentions" in the body appear as User IDs.
+- Message bodies have escaped HTML entities.
+- Any "@-mentions" in message bodies appear as User IDs.
