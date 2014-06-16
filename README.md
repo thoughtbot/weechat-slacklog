@@ -23,6 +23,12 @@ Pull [Slack][] chat history in when opening a new buffer.
 /script load slacklog.rb
 ```
 
+To setup auto-loading:
+
+```
+% cd ~/.weechat/ruby/autoload && ln -s ../slacklog.rb .
+```
+
 Find your API token [here][docs].
 
 [docs]: https://api.slack.com/
