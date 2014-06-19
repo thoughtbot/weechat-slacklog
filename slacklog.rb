@@ -81,7 +81,7 @@ class SlackAPI
   def format_message_lines(user, body)
     return [] unless user
 
-    body.lines.map { |line| "#{user["name"]}\t#{line.chomp}" }
+    body.lines.map { |line| "#{user["name"]}\t#{CGI.unescapeHTML(line.chomp)}" }
   end
 
   def rpc(method, arguments = {})

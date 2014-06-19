@@ -67,8 +67,8 @@ context "slacklog.rb" do
       api = SlackAPI.new(token)
       message = %{```
 m = MyModel.new(whatever: 'foo')
-m.whatever # =&gt; 'foo'
-m.my_hstore # =&gt; { 'whatever' =&gt; 'foo' }
+m.whatever
+m.my_hstore
 ```}
       mock_history_message("general", "pat", message)
 
@@ -77,10 +77,19 @@ m.my_hstore # =&gt; { 'whatever' =&gt; 'foo' }
       expect(backlog).to eq [
         "pat\t```",
         "pat\tm = MyModel.new(whatever: 'foo')",
-        "pat\tm.whatever # =&gt; 'foo'",
-        "pat\tm.my_hstore # =&gt; { 'whatever' =&gt; 'foo' }",
+        "pat\tm.whatever",
+        "pat\tm.my_hstore",
         "pat\t```",
       ]
+    end
+
+    it "de-escapes HTML entities" do
+      api = SlackAPI.new(token)
+      mock_history_message("general", "pat", "My code &gt; your code")
+
+      backlog = api.backlog("#general")
+
+      expect(backlog).to eq ["pat\tMy code > your code"]
     end
 
     def mock_history_message(channel, user, message)
