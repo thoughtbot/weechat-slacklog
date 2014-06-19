@@ -52,12 +52,12 @@ class SlackAPI
     name = name.sub(/^#/, "")
     members = rpc("users.list").fetch("members")
 
-    history(name).reverse.map do |message|
-      if user_id = message["user"]
-        user = members.detect { |u| u["id"] == user_id }
-        user && "#{user["name"]}\t#{message["text"]}"
-      end
-    end.compact
+    history(name).reverse.flat_map do |message|
+      user = message.key?("user") &&
+        members.detect { |u| u["id"] == message["user"] }
+
+      format_message_lines(user, message["text"])
+    end
   end
 
   private
@@ -76,6 +76,12 @@ class SlackAPI
     end
 
     []
+  end
+
+  def format_message_lines(user, body)
+    return [] unless user
+
+    body.lines.map { |line| "#{user["name"]}\t#{line.chomp}" }
   end
 
   def rpc(method, arguments = {})

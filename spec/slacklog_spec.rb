@@ -63,6 +63,40 @@ context "slacklog.rb" do
       end
     end
 
+    it "handles multi-line messages correctly" do
+      api = SlackAPI.new(token)
+      message = %{```
+m = MyModel.new(whatever: 'foo')
+m.whatever # =&gt; 'foo'
+m.my_hstore # =&gt; { 'whatever' =&gt; 'foo' }
+```}
+      mock_history_message("general", "pat", message)
+
+      backlog = api.backlog("#general")
+
+      expect(backlog).to eq [
+        "pat\t```",
+        "pat\tm = MyModel.new(whatever: 'foo')",
+        "pat\tm.whatever # =&gt; 'foo'",
+        "pat\tm.my_hstore # =&gt; { 'whatever' =&gt; 'foo' }",
+        "pat\t```",
+      ]
+    end
+
+    def mock_history_message(channel, user, message)
+      mock_slack_api(
+        "users.list?token=#{token}" => {
+          ok: true, members: [{ id: "1", name: user }]
+        },
+        "channels.list?token=#{token}" => {
+          ok: true, channels: [{ id: "123", name: channel }]
+        },
+        "channels.history?token=#{token}&channel=123" => {
+          ok: true, messages: [{ user: "1", text: message }]
+        },
+      )
+    end
+
     def mock_slack_api(requests)
       requests.each do |path, response|
         stub_request(:get, "#{SlackAPI::BASE_URL}/#{path}").
