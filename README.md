@@ -12,7 +12,7 @@ This script is not yet released, please install manually:
 
 ```
 % curl -o ~/.weechat/ruby/slacklog.rb \
-  "https://raw.githubusercontent.com/pbrisbin/weechat-slacklog/master/slacklog.rb"
+  "https://raw.githubusercontent.com/thoughtbot/weechat-slacklog/master/slacklog.rb"
 ```
 
 Optionally set the script to autoload when WeeChat starts:
