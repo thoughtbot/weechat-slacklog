@@ -38,7 +38,11 @@ Restart weechat or load the script manually:
 
 [docs]: https://api.slack.com#auth
 
-## Known bugs
+## Usage
 
-- Message bodies have escaped HTML entities.
-- Any "@-mentions" in message bodies appear as User IDs.
+Whenever you open a buffer for a server in your `servers` list (and 
+which has a token defined), 100 messages of history will be fetched via 
+the Slack API and printed into the buffer.
+
+The `/slacklog` command can be used to actively fetch and print history 
+for an already open buffer.
