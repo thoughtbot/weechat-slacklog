@@ -186,9 +186,9 @@ def weechat_init
   Weechat::WEECHAT_RC_OK
 end
 
-if ARGV.first == "fetch"
-  _, token, room_name = ARGV
+if ARGV.shift == "fetch"
+  token, room_name, count = ARGV
 
   slack_api = SlackAPI.new(token)
-  slack_api.backlog(room_name).each { |line| puts line }
+  slack_api.backlog(room_name, count).each { |line| puts line }
 end
