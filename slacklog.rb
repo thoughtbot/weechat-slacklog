@@ -106,7 +106,7 @@ class SlackAPI
   end
 end
 
-def on_buffer_opened(_, _, buffer_id)
+def output_history(buffer_id)
   server, name = Weechat.buffer_get_string(buffer_id, "name").split('.')
 
   if token = API_TOKENS[server]
@@ -115,6 +115,14 @@ def on_buffer_opened(_, _, buffer_id)
   end
 
   Weechat::WEECHAT_RC_OK
+end
+
+def on_slacklog(_, buffer_id, _)
+  output_history(buffer_id)
+end
+
+def on_buffer_opened(_, _, buffer_id)
+  output_history(buffer_id)
 end
 
 def on_process_complete(buffer_id, _, rc, out, err)
@@ -157,6 +165,11 @@ def weechat_init
 
   Weechat.hook_config("#{NAMESPACE}.*", "read_tokens", "")
   Weechat.hook_signal("buffer_opened", "on_buffer_opened", "")
+
+  Weechat.hook_command(
+    "slacklog", "print slack history into buffer",
+    "", "", "", "on_slacklog", ""
+  )
 
   read_tokens
 
