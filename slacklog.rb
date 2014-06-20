@@ -149,7 +149,8 @@ end
 
 def on_process_complete(buffer_id, _, rc, out, err)
   if rc.to_i == 0
-    color = Weechat.color("darkgray,normal")
+    fg = Weechat.config_color(Weechat.config_get("logger.color.backlog_line"))
+    color = Weechat.color("#{fg},default}")
 
     out.lines do |line|
       nick, text = line.strip.split("\t")
