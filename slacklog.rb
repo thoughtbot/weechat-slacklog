@@ -49,11 +49,11 @@ class SlackAPI
     @token = token
   end
 
-  def backlog(name)
+  def backlog(name, count = nil)
     name = name.sub(/^#/, "")
     members = rpc("users.list").fetch("members")
 
-    history(name).reverse.flat_map do |message|
+    history(name, count).reverse.flat_map do |message|
       user = message.key?("user") &&
         members.detect { |u| u["id"] == message["user"] }
 
@@ -63,20 +63,30 @@ class SlackAPI
 
   private
 
-  def history(name)
+  def history(name, count = nil)
     channels = rpc("channels.list").fetch("channels")
 
     if channel = channels.detect { |c| c["name"] == name }
-      return rpc("channels.history", channel: channel["id"]).fetch("messages")
+      return rpc("channels.history", history_params(channel, count)).fetch("messages")
     end
 
     groups = rpc("groups.list").fetch("groups")
 
     if group = groups.detect { |g| g["name"] == name }
-      return rpc("groups.history", channel: group["id"]).fetch("messages")
+      return rpc("groups.history", history_params(group, count)).fetch("messages")
     end
 
     []
+  end
+
+  def history_params(room, count)
+    params = { channel: room["id"] }
+
+    if count
+      params[:count] = count
+    end
+
+    params
   end
 
   def format_message_lines(user, body)

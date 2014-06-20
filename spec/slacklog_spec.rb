@@ -92,6 +92,28 @@ m.my_hstore
       expect(backlog).to eq ["pat\tMy code > your code"]
     end
 
+    it "can have the number of messages to display configured" do
+      api = SlackAPI.new(token)
+      mock_slack_api(
+        "users.list?token=#{token}" => {
+          ok: true, members: [{ id: "1", name: "pat" }]
+        },
+        "channels.list?token=#{token}" => {
+          ok: true, channels: [{ id: "123", name: "general" }]
+        },
+        "channels.history?token=#{token}&channel=123&count=2" => {
+          ok: true, messages: [
+            { user: "1", text: "One" },
+            { user: "1", text: "Two" },
+          ]
+        },
+      )
+
+      backlog = api.backlog("#general", 2)
+
+      expect(backlog).to eq ["pat\tTwo", "pat\tOne"]
+    end
+
     def mock_history_message(channel, user, message)
       mock_slack_api(
         "users.list?token=#{token}" => {
