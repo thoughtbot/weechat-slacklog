@@ -38,6 +38,22 @@ Restart WeeChat or load the script manually:
 
 [docs]: https://api.slack.com#auth
 
+## Optional Settings
+
+By default, the Slack API returns 100 messages when no count is 
+specified. You can change this by setting a value between 1 and 1000:
+
+```
+/set plugins.var.ruby.slacklog.count 500
+```
+
+To change the color of Slacklog lines, change the following WeeChat 
+setting:
+
+```
+/set logger.color.backlog_line darkgray
+```
+
 ## Usage
 
 Whenever you open a buffer for a server in your `servers` list (and 
