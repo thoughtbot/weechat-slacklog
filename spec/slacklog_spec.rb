@@ -136,13 +136,13 @@ m.my_hstore
     end
   end
 
-  context "on_buffer_opened" do
-    it "spawns the script if we have a token" do
+  context "on_join" do
+    it "spawns the script if it's us joining and we have a token" do
       API_TOKENS["foo"] = "api-token"
-      allow(Weechat).to receive(:buffer_get_string).
-        with("1", "name").and_return("foo.#bar")
+      simulate_nick("foo", "pbrisbin")
+      simulate_buffers("1" => "foo.#bar")
 
-      on_buffer_opened(nil, nil, "1")
+      simulate_join("1", "foo", "#bar", "pbrisbin")
 
       expect(Weechat).to have_received(:hook_process).
         with(
@@ -153,13 +153,45 @@ m.my_hstore
         )
     end
 
-    it "does nothing if we have no token" do
-      allow(Weechat).to receive(:buffer_get_string).
-        with("1", "name").and_return("foo.#bar")
+    it "does nothing if it's not our nick" do
+      simulate_nick("foo", "pbrisbin")
 
-      on_buffer_opened(nil, nil, "1")
+      simulate_join("1", "foo", "#bar", "jferris")
 
       expect(Weechat).not_to have_received(:hook_process)
+    end
+
+    it "does nothing if we have no token" do
+      simulate_nick("foo", "pbrisbin")
+      simulate_buffers("1" => "foo.#bar")
+
+      simulate_join("1", "foo", "#bar", "pbrisbin")
+
+      expect(Weechat).not_to have_received(:hook_process)
+    end
+
+    def simulate_nick(server, nick)
+      allow(Weechat).to receive("info_get").
+        with("irc_nick", server).and_return(nick)
+    end
+
+    def simulate_buffers(buffers)
+      buffers.each do |buffer_id, buffer_name|
+        allow(Weechat).to receive(:buffer_get_string).
+          with(buffer_id, "name").and_return(buffer_name)
+      end
+    end
+
+    def simulate_join(buffer_id, server, channel, nick)
+      signal = "#{server},irc_in2_JOIN"
+      data = ":#{nick}!#{nick}@example.com JOIN #{channel}"
+
+      allow(Weechat).to receive("info_get").
+        with("irc_nick_from_host", data).and_return(nick)
+      allow(Weechat).to receive("info_get").
+        with("irc_buffer", "#{server},#{channel}").and_return(buffer_id)
+
+      on_join("", signal, data)
     end
   end
 

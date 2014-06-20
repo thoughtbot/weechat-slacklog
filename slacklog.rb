@@ -131,7 +131,19 @@ def on_slacklog(_, buffer_id, _)
   output_history(buffer_id)
 end
 
-def on_buffer_opened(_, _, buffer_id)
+def on_join(_, signal, data)
+  server = signal.split(",").first
+  nick = Weechat.info_get("irc_nick", server)
+  joined_nick = Weechat.info_get("irc_nick_from_host", data)
+
+  if joined_nick != nick
+    # Not our own JOIN event
+    return Weechat::WEECHAT_RC_OK
+  end
+
+  channel = data.sub(/.*JOIN (.*)$/, '\1')
+  buffer_id = Weechat.info_get("irc_buffer", "#{server},#{channel}")
+
   output_history(buffer_id)
 end
 
@@ -174,7 +186,7 @@ def weechat_init
   )
 
   Weechat.hook_config("#{NAMESPACE}.*", "read_tokens", "")
-  Weechat.hook_signal("buffer_opened", "on_buffer_opened", "")
+  Weechat.hook_signal("*,irc_in2_join", "on_join", "")
 
   Weechat.hook_command(
     "slacklog", "print slack history into buffer",
