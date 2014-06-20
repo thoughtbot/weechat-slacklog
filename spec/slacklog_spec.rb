@@ -153,9 +153,9 @@ m.my_hstore
     end
 
     it "prints error messages when unsuccessful" do
-      out = "foo\nbar\nbaz\nbat\n"
+      err = "foo\nbar\nbaz\nbat\n"
 
-      on_process_complete("1", nil, 127, out, nil)
+      on_process_complete("1", nil, 127, nil, err)
 
       expect(Weechat).to have_received(:print).with("", "slacklog error: foo")
       expect(Weechat).to have_received(:print).with("", "slacklog error: bar")
@@ -193,6 +193,7 @@ m.my_hstore
           expect(Weechat).to have_received(:register)
           expect(Weechat).to have_received(:hook_config)
           expect(Weechat).to have_received(:hook_signal)
+          expect(Weechat).to have_received(:hook_command)
         end
 
         it "initializes tokens" do

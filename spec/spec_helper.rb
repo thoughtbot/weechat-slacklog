@@ -16,6 +16,7 @@ RSpec.configure do |conf|
     allow(Weechat).to receive(:hook_config)
     allow(Weechat).to receive(:hook_process)
     allow(Weechat).to receive(:hook_signal)
+    allow(Weechat).to receive(:hook_command)
     allow(Weechat).to receive(:print)
     allow(Weechat).to receive(:register)
   end
