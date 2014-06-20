@@ -46,3 +46,23 @@ the Slack API and printed into the buffer.
 
 The `/slacklog` command can be used to actively fetch and print history 
 for an already open buffer.
+
+## Implementation Details
+
+The script can be used outside of WeeChat like so:
+
+```
+% ruby ./slacklog.rb fetch API-TOKEN CHANNEL
+```
+
+This prints history messages on `stdout` and has no dependencies on the 
+`Weechat` module. The implementation is contained in a normal `SlackAPI` 
+class which is well tested.
+
+Global functions wire this up as a WeeChat plugin in the following way:
+
+- When a buffer is opened or the `/slacklog` command is invoked, we 
+  determine the token and channel then ask `Weechat` to asynchronously 
+  execute our script as above with a callback.
+- The callback will receive the lines output by our script, and print 
+  them into the buffer.
