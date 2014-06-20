@@ -15,13 +15,13 @@ This script is not yet released, please install manually:
   "https://raw.githubusercontent.com/pbrisbin/weechat-slacklog/master/slacklog.rb"
 ```
 
-Optionally set the script to autoload when weechat starts:
+Optionally set the script to autoload when WeeChat starts:
 
 ```
 % cd ~/.weechat/ruby/autoload && ln -s ../slacklog.rb .
 ```
 
-Restart weechat or load the script manually:
+Restart WeeChat or load the script manually:
 
 ```
 /script load slacklog.rb
