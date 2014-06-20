@@ -120,7 +120,8 @@ def output_history(buffer_id)
   server, name = Weechat.buffer_get_string(buffer_id, "name").split('.')
 
   if token = API_TOKENS[server]
-    run_script = "ruby '#{SCRIPT_FILE}' fetch '#{token}' '#{name}'"
+    count = Weechat.config_get_plugin("count")
+    run_script = "ruby '#{SCRIPT_FILE}' fetch '#{token}' '#{name}' #{count}"
     Weechat.hook_process(run_script, 0, "on_process_complete", buffer_id)
   end
 

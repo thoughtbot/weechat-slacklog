@@ -146,7 +146,24 @@ m.my_hstore
 
       expect(Weechat).to have_received(:hook_process).
         with(
-          "ruby '#{SCRIPT_FILE}' fetch 'api-token' '#bar'",
+          "ruby '#{SCRIPT_FILE}' fetch 'api-token' '#bar' ",
+          0,
+          "on_process_complete",
+          "1"
+        )
+    end
+
+    it "includes count if configured" do
+      API_TOKENS["foo"] = "api-token"
+      simulate_nick("foo", "pbrisbin")
+      simulate_buffers("1" => "foo.#bar")
+      allow(Weechat).to receive(:config_get_plugin).with("count").and_return("10")
+
+      simulate_join("1", "foo", "#bar", "pbrisbin")
+
+      expect(Weechat).to have_received(:hook_process).
+        with(
+          "ruby '#{SCRIPT_FILE}' fetch 'api-token' '#bar' 10",
           0,
           "on_process_complete",
           "1"
