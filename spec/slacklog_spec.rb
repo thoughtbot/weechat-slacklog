@@ -198,6 +198,8 @@ m.my_hstore
   context "on_process_complete" do
     it "prints colorized history on success" do
       out = "foo\tbar\nbaz\tbat\n"
+      allow(Weechat).to receive(:config_get)
+      allow(Weechat).to receive(:config_color)
       allow(Weechat).to receive(:color).and_return("C")
 
       on_process_complete("1", nil, 0, out, nil)
