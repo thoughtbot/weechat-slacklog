@@ -27,6 +27,7 @@
 # - plugins.var.ruby.slacklog.bar.api_token "bar-api-token"
 #
 ###
+require "cgi"
 require "json"
 require "net/https"
 require "uri"
