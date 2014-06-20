@@ -117,7 +117,7 @@ def on_buffer_opened(_, _, buffer_id)
   Weechat::WEECHAT_RC_OK
 end
 
-def on_process_complete(buffer_id, _, rc, out, _)
+def on_process_complete(buffer_id, _, rc, out, err)
   if rc.to_i == 0
     color = Weechat.color("darkgray,normal")
 
@@ -128,7 +128,7 @@ def on_process_complete(buffer_id, _, rc, out, _)
   end
 
   if rc.to_i > 0
-    out.lines do |line|
+    err.lines do |line|
       Weechat.print("", "slacklog error: #{line.strip}")
     end
   end
