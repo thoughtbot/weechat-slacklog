@@ -98,7 +98,9 @@ class SlackAPI
   def rpc(method, arguments = {})
     params = parameterize({ token: @token }.merge(arguments))
     uri = URI.parse("#{BASE_URL}/#{method}?#{params}")
-    response = Net::HTTP.get_response(uri)
+    response = Net::HTTP.start(uri.host, use_ssl: true) do |http|
+      http.get uri.request_uri
+    end
 
     JSON.parse(response.body).tap do |result|
       result["ok"] or raise "API Error: #{result.inspect}"
