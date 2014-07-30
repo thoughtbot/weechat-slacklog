@@ -99,7 +99,7 @@ class SlackAPI
     params = parameterize({ token: @token }.merge(arguments))
     uri = URI.parse("#{BASE_URL}/#{method}?#{params}")
     response = Net::HTTP.start(uri.host, use_ssl: true) do |http|
-      http.get uri.request_uri
+      http.get(uri.request_uri)
     end
 
     JSON.parse(response.body).tap do |result|
