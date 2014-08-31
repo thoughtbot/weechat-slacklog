@@ -198,8 +198,6 @@ def weechat_init
   )
 
   read_tokens
-
-  Weechat::WEECHAT_RC_OK
 end
 
 if ARGV.shift == "fetch"
