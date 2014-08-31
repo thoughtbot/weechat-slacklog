@@ -130,8 +130,23 @@ def output_history(buffer_id)
   Weechat::WEECHAT_RC_OK
 end
 
-def on_slacklog(_, buffer_id, _)
-  output_history(buffer_id)
+def on_slacklog(_, buffer_id, args)
+  if /^add (?<server>[^ ]*) (?<token>[^ ]*)$/ =~ args
+    server_list = Weechat.config_get_plugin("servers")
+    Weechat.config_set_plugin("servers", "#{server_list},#{server}")
+    Weechat.config_set_plugin("#{server}.api_token", token)
+
+    read_tokens
+  elsif /^remove (?<server>[^ ]*)$/ =~ args
+    server_list = Weechat.config_get_plugin("servers")
+    server_list = server_list.split(',').reject { |s| s == server }.join(',')
+    Weechat.config_set_plugin("servers", server_list)
+    Weechat.config_unset_plugin("#{server}.api_token")
+
+    read_tokens
+  else
+    output_history(buffer_id)
+  end
 end
 
 def on_join(_, signal, data)
@@ -193,8 +208,10 @@ def weechat_init
   Weechat.hook_signal("*,irc_in2_join", "on_join", "")
 
   Weechat.hook_command(
-    "slacklog", "print slack history into buffer",
-    "", "", "", "on_slacklog", ""
+    "slacklog",
+    "manage servers, or print history in current buffer",
+    "[add server api-token | remove server |]",
+    "", "", "on_slacklog", ""
   )
 
   read_tokens

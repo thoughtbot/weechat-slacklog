@@ -36,6 +36,12 @@ Restart WeeChat or load the script manually:
 /set plugins.var.ruby.slacklog.thoughtbot.api_token "abc-123"
 ```
 
+These variables can also be modified via the `/slacklog` command:
+
+```
+/slacklog add thoughtbot abc-123
+```
+
 [docs]: https://api.slack.com#auth
 
 ## Optional Settings
@@ -60,8 +66,8 @@ Whenever you open a buffer for a server in your `servers` list (and
 which has a token defined), 100 messages of history will be fetched via 
 the Slack API and printed into the buffer.
 
-The `/slacklog` command can be used to actively fetch and print history 
-for an already open buffer.
+The `/slacklog` command can be used without arguments to actively fetch 
+and print history for an already open buffer.
 
 ## Implementation Details
 
