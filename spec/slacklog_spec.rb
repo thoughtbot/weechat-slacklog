@@ -83,6 +83,18 @@ m.my_hstore
       ]
     end
 
+    it "replaces userids with usernames if available" do
+      api = SlackAPI.new(token)
+      mock_history_message("general", "pat", "Hey <@2> and <@3> and <@4>", [
+        { id: "2", name: "adarsh" },
+        { id: "3", name: "jferris" }
+      ])
+
+      backlog = api.backlog("#general")
+
+      expect(backlog).to eq ["pat\tHey adarsh and jferris and <@4>"]
+    end
+
     it "de-escapes HTML entities" do
       api = SlackAPI.new(token)
       mock_history_message("general", "pat", "My code &gt; your code")
@@ -114,10 +126,10 @@ m.my_hstore
       expect(backlog).to eq ["pat\tTwo", "pat\tOne"]
     end
 
-    def mock_history_message(channel, user, message)
+    def mock_history_message(channel, user, message, members = [])
       mock_slack_api(
         "users.list?token=#{token}" => {
-          ok: true, members: [{ id: "1", name: user }]
+          ok: true, members: [{ id: "1", name: user }] + members
         },
         "channels.list?token=#{token}" => {
           ok: true, channels: [{ id: "123", name: channel }]

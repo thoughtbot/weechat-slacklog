@@ -57,7 +57,7 @@ class SlackAPI
       user = message.key?("user") &&
         members.detect { |u| u["id"] == message["user"] }
 
-      format_message_lines(user, message["text"])
+      format_message_lines(user, message["text"], members)
     end
   end
 
@@ -89,10 +89,24 @@ class SlackAPI
     params
   end
 
-  def format_message_lines(user, body)
+  def format_message_lines(user, body, members)
     return [] unless user
 
-    body.lines.map { |line| "#{user["name"]}\t#{CGI.unescapeHTML(line.chomp)}" }
+    body.lines.map do |line|
+      fixed = fix_usernames(line.chomp, members)
+
+      "#{user["name"]}\t#{CGI.unescapeHTML(fixed)}"
+    end
+  end
+
+  def fix_usernames(line, members)
+    line.gsub(/<@(.*?)>/) do |match|
+      if user = members.detect { |u| u["id"] == $1 }
+        user["name"]
+      else
+        match
+      end
+    end
   end
 
   def rpc(method, arguments = {})
