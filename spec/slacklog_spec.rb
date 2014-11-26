@@ -95,6 +95,15 @@ m.my_hstore
       expect(backlog).to eq ["pat\tHey adarsh and jferris and <@4>"]
     end
 
+    it "fixes join/part usernames" do
+      api = SlackAPI.new(token)
+      mock_history_message("general", "pat", "<@3|pat> has joined")
+
+      backlog = api.backlog("#general")
+
+      expect(backlog).to eq ["pat\tpat has joined"]
+    end
+
     it "de-escapes HTML entities" do
       api = SlackAPI.new(token)
       mock_history_message("general", "pat", "My code &gt; your code")

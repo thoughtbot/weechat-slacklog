@@ -93,10 +93,14 @@ class SlackAPI
     return [] unless user
 
     body.lines.map do |line|
-      fixed = fix_usernames(line.chomp, members)
+      fixed = fix_join_parts(fix_usernames(line.chomp, members))
 
       "#{user["name"]}\t#{CGI.unescapeHTML(fixed)}"
     end
+  end
+
+  def fix_join_parts(line)
+    line.gsub(/<@.*?\|(.*?)>/, '\1')
   end
 
   def fix_usernames(line, members)
