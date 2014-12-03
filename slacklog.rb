@@ -188,7 +188,11 @@ end
 def read_tokens(*)
   server_list = Weechat.config_get_plugin("servers")
   server_list.split(",").map(&:strip).each do |server|
-    API_TOKENS[server] = Weechat.config_get_plugin("#{server}.api_token")
+    api_token = Weechat.config_get_plugin("#{server}.api_token")
+    if api_token.start_with?('${sec.data.')
+      api_token = Weechat.string_eval_expression(api_token, {}, {}, {})
+    end
+    API_TOKENS[server] = api_token
   end
 
   Weechat::WEECHAT_RC_OK
