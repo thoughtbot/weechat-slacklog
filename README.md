@@ -42,7 +42,7 @@ These variables can also be modified via the `/slacklog` command:
 /slacklog add thoughtbot abc-123
 ```
 
-[docs]: https://api.slack.com#auth
+[docs]: https://api.slack.com/web#authentication
 
 ## Optional Settings
 
