@@ -143,6 +143,8 @@ def output_history(buffer_id)
     count = Weechat.config_get_plugin("count")
     run_script = "ruby '#{SCRIPT_FILE}' fetch '#{token}' '#{name}' #{count}"
     Weechat.hook_process(run_script, 0, "on_process_complete", buffer_id)
+  else
+    Weechat.print("", "slacklog warn: no token for server '#{server}' found!")
   end
 
   Weechat::WEECHAT_RC_OK
