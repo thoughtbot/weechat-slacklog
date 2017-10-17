@@ -76,6 +76,15 @@ class SlackAPI
       return rpc("groups.history", history_params(group, count)).fetch("messages")
     end
 
+    users = rpc("users.list").fetch("members")
+
+    if user = users.detect { |g| g["name"] == name }
+      ims = rpc("im.list").fetch("ims")
+      if im = ims.detect { |g| g["user"] == user["id"] }
+        return rpc("conversations.history", history_params(im, count)).fetch("messages")
+      end
+    end
+
     []
   end
 
