@@ -1,3 +1,6 @@
+**ARCHIVED**: This project has been archived. The original authors no longer use it
+and Slack is currently phasing out the API it relies on.
+
 # Slacklog
 
 Pull [Slack][] chat history in when opening a new buffer.
